@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: "v8",
-      reporters: ["text", "json", "json-summary"],
+      reporter: ["text", "json", "json-summary"],
     },
   },
 });
