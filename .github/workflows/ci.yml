@@ -22,5 +22,8 @@ jobs:
       - name: Instalar dependencias
         run: bun install
 
+      - name: Ejecutar linting
+        run: bun run check
+
       - name: Ejecutar pruebas
         run: bun run test
