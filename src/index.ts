@@ -17,4 +17,6 @@ app.get("/users", (c) =>
   )
 );
 
+const unusedVariable = "esto causara un error de linting";
+
 export default app;
