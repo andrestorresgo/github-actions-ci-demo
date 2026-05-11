@@ -1,11 +1,25 @@
-To install dependencies:
+# Github Actions CI Demo
+
+Este proyecto es una API REST simple con Hono y Bun.
+
+Se implementó un CRUD en memoria que utiliza la entidad "users".
+
+# Instalación
+
+Para instalar dependencias:
 ```sh
 bun install
 ```
 
-To run:
+Para ejecutar:
 ```sh
 bun run dev
 ```
 
-open http://localhost:3000
+Acceder a [http://localhost:3000](http://localhost:3000)
+
+## Documentación del Laboratorio
+
+Puedes encontrar el informe completo con capturas de pantalla y evidencias en el siguiente enlace:
+
+- [Ver informe del laboratorio](./informe/INFORME.md)
