@@ -9,7 +9,8 @@ app.route("/users", usersApp);
 
 // ruleset test commit
 
+export { app };
 export default {
-  port: 3003,
-  fetch: app.all,
+  fetch: app.fetch,
+  port: 3007,
 };
