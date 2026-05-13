@@ -6,7 +6,7 @@ describe("API tests", () => {
     const response = await app.request("/health");
     const data = await response.json();
     expect(response.status).toBe(200);
-    expect(data).toEqual({ status: "ok", version: "v2.0.0" });
+    expect(data).toEqual({ status: "ok", version: "v3.0.0" });
   });
 
   describe("Users CRUD", () => {

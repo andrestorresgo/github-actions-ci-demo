@@ -193,9 +193,49 @@ app.get("/health", (c) => {
 
 Se realizó un push a una rama nueva. El flujo de trabajo se ejecutó correctamente y se marcaron los checks como aprobados.
 
-![PR 1](images/pr1.png)
+![PR 1](success.png)
 
 Se ingresó a la IP del servidor y se verificó que la aplicación esté funcionando correctamente. Se puede ver que la versión es la correcta.
 
-![PR 2](images/pr2.png)
+![PR 2](ip-check.png)
 
+# Análisis y Reflexión del Pipeline de CD
+
+## Descripción del pipeline de CD y decisiones técnicas
+El pipeline de CD automatiza el proceso de despliegue continuo desde la validación del código hasta su puesta en producción. Está compuesto por varias etapas cruciales:
+1. **Validación (CI)**: Checkout del repositorio, instalación de dependencias, análisis de código (linting) y ejecución de pruebas con cobertura. Esto asegura que el nuevo código sea funcional y estable.
+2. **Construcción de Imagen Docker**: Se autentica en Docker Hub y se utiliza `docker/build-push-action` para construir la imagen. Se implementa caché (`gha`) para optimizar los tiempos de build, y el Dockerfile utiliza un enfoque *multi-stage* basado en distroless para minimizar el tamaño y superficie de ataque del contenedor.
+3. **Escaneo de Vulnerabilidades**: El flujo de despliegue incorpora una etapa de escaneo de la imagen (por ejemplo, utilizando `aquasecurity/trivy-action`) para detectar vulnerabilidades críticas o de severidad alta en las dependencias y el sistema operativo base antes de permitir la actualización en producción.
+4. **Despliegue Seguro (Zero-Downtime)**: A través de `appleboy/ssh-action` se realiza la conexión al VPS. Para garantizar la disponibilidad de la aplicación, se descarga la nueva imagen y se levanta en un puerto temporal (3001). A continuación, se valida mediante un health check local. Solo si la validación es exitosa, se procede a reemplazar el contenedor principal (puerto 80) y se elimina el temporal. De lo contrario, la actualización se cancela sin afectar la versión estable anterior.
+
+**Decisiones Técnicas Tomadas:**
+- **Uso de GitHub Environments:** Se configuró un entorno (`production`) para gestionar reglas de protección, historial de despliegues y aislar los secretos correspondientes a este ambiente.
+- **Validación Post-Despliegue:** Se decidió implementar una verificación activa en un contenedor temporal antes de exponer el tráfico público, mitigando el riesgo de caída (un enfoque simplificado de blue/green deployment).
+- **Imágenes Multi-stage y Runtime Distroless:** Decisiones enfocadas en la eficiencia, velocidad de descarga en el servidor y reducción de la superficie de vulnerabilidad.
+
+## Fases del Workflow en Actions
+![PR 1](1.png)
+
+![PR 2](2.png)
+
+![PR 3](3.png)
+
+![PR 4](4.png)
+
+## Evidencia de la aplicación funcionando en instancia remota
+![PR 2](ip-check.png)
+
+## Evidencia del Escaneo de Vulnerabilidades
+![PR 2](vuln.png)
+
+## Estrategia de Rollback a una versión anterior
+Existen diferentes maneras de realizar un rollback en caso de introducir un fallo crítico en producción:
+1. **Rollback de Código (Git Revert)**: La estrategia más limpia y natural con CI/CD consiste en hacer un `git revert` del último commit (o commits) con problemas y hacer push a `main`. Esto dispara el workflow nuevamente, empaqueta la versión anterior y la despliega de manera segura con zero-downtime, restaurando la estabilidad de la aplicación manteniendo la trazabilidad en el repositorio.
+2. **Rollback Manual en el Servidor**: Si la caída es extremadamente grave y requiere mitigación inmediata sin esperar el tiempo de construcción del pipeline, al usar contenedores se puede ingresar por SSH al VPS, detener el contenedor actual y relanzarlo utilizando un *tag* previo de la imagen de Docker Hub (por ejemplo, el tag que generamos por hash del commit en vez de `latest`). Esto levanta la versión que sabemos que es estable en cuestión de segundos.
+
+## Reflexión: Ventajas de utilizar contenedores y despliegue continuo en un proyecto real
+El uso conjunto de contenedores y flujos de despliegue continuo (CD) ofrece beneficios sustanciales en proyectos del mundo real:
+- **Consistencia y Fiabilidad**: Los contenedores resuelven el histórico problema de la paridad entre entornos. Lo que funciona y pasa las pruebas en el entorno de CI, se ejecutará idénticamente en el servidor de producción.
+- **Agilidad y Velocidad de Entrega**: Al automatizar todo el proceso (tests, build, push y deploy), los equipos de desarrollo reducen drásticamente el tiempo entre escribir el código y entregarlo al usuario final, permitiendo liberar características o correcciones varias veces al día.
+- **Reducción de Riesgos (Zero Downtime)**: El despliegue automático estandariza los pasos sin intervención manual. Estrategias como el health check antes del reemplazo de puertos permiten evitar indisponibilidades durante las actualizaciones, ofreciendo una experiencia sin interrupciones para el usuario.
+- **Seguridad Integrada (Shift-Left Security)**: Automatizar los análisis estáticos y de vulnerabilidades directamente en el pipeline garantiza un umbral de calidad estricto antes de cada entrega. Además, contar con imágenes inmutables de contenedores prepara la infraestructura para poder escalar ágilmente (por ejemplo, hacia orquestadores como Kubernetes o servicios Cloud Serverless) si la demanda aumenta.
