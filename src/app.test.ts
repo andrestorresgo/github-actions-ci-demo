@@ -2,11 +2,11 @@ import { describe, expect, it, test } from "vitest";
 import app from "./index";
 
 describe("API tests", () => {
-  test("GET /health should return status ok", async () => {
+  test("GET /health should return status ok and version", async () => {
     const response = await app.request("/health");
     const data = await response.json();
     expect(response.status).toBe(200);
-    expect(data).toEqual({ status: "ok" });
+    expect(data).toEqual({ status: "ok", version: "v2.0.0" });
   });
 
   describe("Users CRUD", () => {
