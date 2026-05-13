@@ -12,5 +12,5 @@ app.route("/users", usersApp);
 export { app };
 export default {
   fetch: app.fetch,
-  port: 3007,
+  port: 3000,
 };
