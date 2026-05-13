@@ -44,8 +44,8 @@ jobs:
             IMAGE="${{ secrets.DOCKER_USERNAME }}/hono-bun-app:latest"
 
             # 1. Desplegar la nueva imagen en un puerto alterno (3001) para validación
-            docker pull $IMAGE
-            docker run -d \
+            sudo docker pull $IMAGE
+            sudo docker run -d \
               --name hono-bun-app-new \
               --restart unless-stopped \
               -p 3001:3000 \
@@ -59,23 +59,23 @@ jobs:
               echo "Health check exitoso. Activando nuevo contenedor..."
               
               # 4. Detener y eliminar el contenedor viejo (si existe)
-              docker stop hono-bun-app || true
-              docker rm hono-bun-app || true
+              sudo docker stop hono-bun-app || true
+              sudo docker rm hono-bun-app || true
               
               # 5. Exponer el nuevo contenedor en el puerto público 80
-              docker run -d \
+              sudo docker run -d \
                 --name hono-bun-app \
                 --restart unless-stopped \
                 -p 80:3000 \
                 $IMAGE
               
               # 6. Limpiar el contenedor de validación
-              docker rm -f hono-bun-app-new || true
+              sudo docker rm -f hono-bun-app-new || true
             else
               echo "Health check FALLIDO. Cancelando despliegue y manteniendo versión anterior."
-              docker rm -f hono-bun-app-new || true
+              sudo docker rm -f hono-bun-app-new || true
               exit 1
             fi
 
             # 7. Limpieza de imágenes y contenedores huérfanos
-            docker system prune -f
+            sudo docker system prune -f
