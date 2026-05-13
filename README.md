@@ -22,4 +22,5 @@ Acceder a [http://localhost:3000](http://localhost:3000)
 
 Puedes encontrar el informe completo con capturas de pantalla y evidencias en el siguiente enlace:
 
-- [Ver informe del laboratorio](./informe/5.1/INFORME.md)
+- [Ver primer informe del laboratorio](./informe/5.1/INFORME.md)
+- [Ver segundo informe del laboratorio](./informe/5.2/informe.md)
