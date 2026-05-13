@@ -18,10 +18,10 @@
 4. **Secretos**:
    - Se configuraron los siguientes secretos en el repositorio de GitHub:
      - `DOCKER_USERNAME`: Usuario de Docker Hub.
-     - `DOCKER_TOKEN`: Token de Docker Hub.
-     - `SERVER_IP`: Dirección IP del servidor remoto.
-     - `SSH_USERNAME`: Usuario del servidor remoto.
-     - `SSH_KEY`: Clave SSH del servidor remoto.
+     - `DOCKER_PASSWORD`: Contraseña de Docker Hub.
+     - `SSH_HOST`: Dirección IP del servidor remoto.
+     - `SSH_USER`: Usuario del servidor remoto.
+     - `SSH_PRIVATE_KEY`: Clave SSH del servidor remoto.
 
 
 # Código
@@ -195,10 +195,7 @@ Se realizó un push a una rama nueva. El flujo de trabajo se ejecutó correctame
 
 ![PR 1](images/pr1.png)
 
-Se agregó un ruleset en github para protección del branch main. Este ruleset requiere que se ejecute el flujo de trabajo y que se apruebe el pull request para que se pueda hacer merge.
+Se ingresó a la IP del servidor y se verificó que la aplicación esté funcionando correctamente. Se puede ver que la versión es la correcta.
 
 ![PR 2](images/pr2.png)
 
-Se realizó un Pull Request apuntando a main y el flujo de trabajo se ejecutó correctamente. La opción de merge se encontraba deshabilitada hasta el momento en el que los checks se marcaron como aprobados.
-
-![PR 3](images/pr3.png)
